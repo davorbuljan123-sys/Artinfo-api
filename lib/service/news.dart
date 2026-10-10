@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:portal_news/model/article_model.dart';
 import 'package:portal_news/service/app_constants.dart';
 
-class NewsService {
+class News {
   // Dohvat svih članaka s artinfo.ba
   Future<List<ArticleModel>> fetchArticles() async {
     try {
