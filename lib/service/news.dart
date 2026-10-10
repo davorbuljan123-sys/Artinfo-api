@@ -1,5 +1,5 @@
 import 'package:http/http.dart' as http;
-import 'package:webfeed/webfeed.dart'; // Korištenje standardnog webfeed paketa
+import 'package:xml/xml.dart'; // Uvozimo xml paket
 import 'package:portal_news/model/article_model.dart';
 import 'package:portal_news/service/app_constants.dart';
 
@@ -11,29 +11,40 @@ class News {
       final response = await http.get(Uri.parse(AppConstants.allNews));
 
       if (response.statusCode == 200) {
-        // Parsiramo RSS XML pomoću WebFeed-a
-        var channel = RssFeed.parse(response.body);
+        // Parsiramo sirovi XML odgovor
+        final document = XmlDocument.parse(response.body);
+        
+        // Dohvaćamo sve <item> elemente unutar RSS-a
+        final items = document.findAllElements('item');
 
-        news = channel.items?.map((item) {
-          String? imageUrl;
-          if (item.enclosure?.url != null) {
-            imageUrl = item.enclosure!.url;
-          } else if (item.description != null) {
+        news = items.map((item) {
+          final title = item.findElements('title').firstOrNull?.innerText ?? 'Bez naslova';
+          final description = item.findElements('description').firstOrNull?.innerText ?? '';
+          final link = item.findElements('link').firstOrNull?.innerText ?? '';
+          final pubDate = item.findElements('pubDate').firstOrNull?.innerText ?? '';
+
+          // Pokušavamo izvući sliku iz enclosure tag-a ili iz opisa
+          String imageUrl = '';
+          final enclosure = item.findElements('enclosure').firstOrNull;
+          if (enclosure != null && enclosure.getAttribute('url') != null) {
+            imageUrl = enclosure.getAttribute('url')!;
+          } else {
+            // Tražimo prvu sliku unutar opisa (HTML-a)
             final regExp = RegExp(r'src="([^"]+)"');
-            final match = regExp.firstMatch(item.description!);
+            final match = regExp.firstMatch(description);
             if (match != null) {
-              imageUrl = match.group(1);
+              imageUrl = match.group(1) ?? '';
             }
           }
 
           return ArticleModel(
-            title: item.title ?? 'Bez naslova',
-            description: item.description ?? '',
-            url: item.link ?? '',
-            urlToImage: imageUrl ?? '',
-            publishedAt: item.pubDate?.toString() ?? '',
+            title: title,
+            description: description,
+            url: link,
+            urlToImage: imageUrl,
+            publishedAt: pubDate,
           );
-        }).toList() ?? [];
+        }).toList();
 
       } else {
         throw Exception('Neuspješno dohvaćanje RSS feeda: ${response.statusCode}');
