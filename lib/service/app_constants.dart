@@ -1,24 +1,45 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:portal_news/model/article_model.dart';
+import 'package:portal_news/service/app_constants.dart';
 
-class AppConstants {
-  // Osnovni API URL za artinfo.ba
-  static const String baseUrl = 'https://artinfo.ba/wp-json/wp/v2/';
+class News {
+  // Dohvat svih članaka s artinfo.ba
+  Future<List<ArticleModel>> fetchArticles() async {
+    try {
+      final response = await http.get(Uri.parse(AppConstants.allNews));
 
-  // Definicija kategorija i njihovih WordPress API endpointova
-  // (Napomena: WordPress ID-jevi kategorija se prema potrebi mogu prilagoditi ovisno o ID-ju na CMS-u, 
-  // ali se mogu pozivati i direktno preko slug/naziva ili mapiranih ruta)
-  static const String allNews = '${baseUrl}posts?_embed';
-  
-  // Primjeri kategorija prema izborniku portala artinfo.ba
-  static const String categoryVijesti = '${baseUrl}posts?categories=1&_embed'; // ID za Vijesti (primjer)
-  static const String categorySport = '${baseUrl}posts?categories=2&_embed';    // ID za Sport (primjer)
-  static const String categoryKultura = '${baseUrl}posts?categories=3&_embed';  // ID za Kultura (primjer)
-  static const String categoryCrnaKronika = '${baseUrl}posts?categories=4&_embed'; // ID za Crnu kroniku
-  static const String categoryPolitika = '${baseUrl}posts?categories=5&_embed';     // ID za Politiku
-  static const String categoryZanimljivosti = '${baseUrl}posts?categories=6&_embed'; // ID za Zanimljivosti
+      if (response.statusCode == 200) {
+        List<dynamic> body = jsonDecode(response.body);
+        List<ArticleModel> articles = body
+            .map((dynamic item) => ArticleModel.fromJson(item))
+            .toList();
+        return articles;
+      } else {
+        throw Exception('Neuspješno dohvaćanje vijesti: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Greška prilikom spajanja na API: $e');
+    }
+  }
 
-  // Metoda za dinamičko generiranje linka prema ID-ju kategorije
-  static String getPostsByCategory(int categoryId) {
-    return '${baseUrl}posts?categories=$categoryId&_embed';
+  // Dohvat članaka prema ID-ju specifične kategorije s artinfo.ba
+  Future<List<ArticleModel>> fetchArticlesByCategory(int categoryId) async {
+    try {
+      final endpoint = AppConstants.getPostsByCategory(categoryId);
+      final response = await http.get(Uri.parse(endpoint));
+
+      if (response.statusCode == 200) {
+        List<dynamic> body = jsonDecode(response.body);
+        List<ArticleModel> articles = body
+            .map((dynamic item) => ArticleModel.fromJson(item))
+            .toList();
+        return articles;
+      } else {
+        throw Exception('Neuspješno dohvaćanje kategorije: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Greška prilikom spajanja na API: $e');
+    }
   }
 }
