@@ -1,10 +1,10 @@
 name: Build Flutter APK
 
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+  workflow_dispatch: # Ova linija omogućuje ručno pokretanje (Manual trigger)
+  # push:
+  #   branches: [ "main" ] # Ako želiš skroz ugasiti push, stavi # ispred push-a ili ga obriši
+ 
 
 jobs:
   build:
