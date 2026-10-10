@@ -30,7 +30,8 @@ jobs:
         run: flutter pub get
 
       - name: Izgradi Release APK
-        run: flutter build apk --release
+        run: flutter build apk --release --android-skip-build-dependency-validation
+
 
       - name: Prenesi APK kao artefakt
         uses: actions/upload-artifact@v4
