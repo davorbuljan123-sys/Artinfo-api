@@ -35,6 +35,7 @@ dependencies:
   font_awesome_flutter: ^10.8.0
   google_fonts: ^6.2.1
   http: ^1.3.0
+  xml: ^6.5.0 # Stabilan i kompatibilan paket za rad s XML-om
   webfeed: ^0.7.0 # Službeni stabilni webfeed paket 
   intl: ^0.20.2
   shimmer: ^3.0.0
