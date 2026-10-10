@@ -1,14 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:portal_news/model/article_model.dart';
+import 'package:portal_news/service/app_constants.dart';
 
 class NewsService {
-  // Postavljen službeni API izvor za artinfo.ba
-  static const String baseUrl = 'https://artinfo.ba/wp-json/wp/v2/';
-
+  // Dohvat svih članaka s artinfo.ba
   Future<List<ArticleModel>> fetchArticles() async {
     try {
-      final response = await http.get(Uri.parse('${baseUrl}posts?_embed'));
+      final response = await http.get(Uri.parse(AppConstants.allNews));
 
       if (response.statusCode == 200) {
         List<dynamic> body = jsonDecode(response.body);
@@ -24,9 +23,11 @@ class NewsService {
     }
   }
 
+  // Dohvat članaka prema ID-ju specifične kategorije s artinfo.ba
   Future<List<ArticleModel>> fetchArticlesByCategory(int categoryId) async {
     try {
-      final response = await http.get(Uri.parse('${baseUrl}posts?categories=$categoryId&_embed'));
+      final endpoint = AppConstants.getPostsByCategory(categoryId);
+      final response = await http.get(Uri.parse(endpoint));
 
       if (response.statusCode == 200) {
         List<dynamic> body = jsonDecode(response.body);
