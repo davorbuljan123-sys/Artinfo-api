@@ -1,45 +1,24 @@
 import 'package:flutter/material.dart';
 
 class AppConstants {
-  static const Color primaryColor = Colors.teal;
-  static const Color backgroundColor = Colors.black;
-  static const Color cardBackgroundColor = Color(0xFF212121);
-  static const Color secondaryTextColor = Colors.white60;
+  // Osnovni API URL za artinfo.ba
+  static const String baseUrl = 'https://artinfo.ba/wp-json/wp/v2/';
 
-  static const TextStyle headerTextStyle = TextStyle(
-    color: Colors.white,
-    fontSize: 20,
-    fontWeight: FontWeight.bold,
-  );
+  // Definicija kategorija i njihovih WordPress API endpointova
+  // (Napomena: WordPress ID-jevi kategorija se prema potrebi mogu prilagoditi ovisno o ID-ju na CMS-u, 
+  // ali se mogu pozivati i direktno preko slug/naziva ili mapiranih ruta)
+  static const String allNews = '${baseUrl}posts?_embed';
+  
+  // Primjeri kategorija prema izborniku portala artinfo.ba
+  static const String categoryVijesti = '${baseUrl}posts?categories=1&_embed'; // ID za Vijesti (primjer)
+  static const String categorySport = '${baseUrl}posts?categories=2&_embed';    // ID za Sport (primjer)
+  static const String categoryKultura = '${baseUrl}posts?categories=3&_embed';  // ID za Kultura (primjer)
+  static const String categoryCrnaKronika = '${baseUrl}posts?categories=4&_embed'; // ID za Crnu kroniku
+  static const String categoryPolitika = '${baseUrl}posts?categories=5&_embed';     // ID za Politiku
+  static const String categoryZanimljivosti = '${baseUrl}posts?categories=6&_embed'; // ID za Zanimljivosti
 
-  static const TextStyle titleTextStyle = TextStyle(
-    color: Colors.white,
-    fontSize: 16,
-    fontWeight: FontWeight.bold,
-  );
-
-  static const TextStyle subtitleTextStyle = TextStyle(
-    color: Colors.white70,
-    fontSize: 14,
-  );
-
-  static const TextStyle captionTextStyle = TextStyle(
-    color: Colors.white60,
-    fontSize: 12,
-  );
-
-  static const List<String> newsCategories = [
-    "All",
-    "Politics",
-    "Technology",
-    "Business",
-  ];
-
-  static const String noNewsErrorMessage = "No news found.";
-  static const String networkErrorMessage = "Network error. Please try again.";
-
-  static const Duration transitionDuration = Duration(milliseconds: 300);
-
-  static const double cardBorderRadius = 12.0;
-  static const EdgeInsets defaultPadding = EdgeInsets.all(16.0);
+  // Metoda za dinamičko generiranje linka prema ID-ju kategorije
+  static String getPostsByCategory(int categoryId) {
+    return '${baseUrl}posts?categories=$categoryId&_embed';
+  }
 }
